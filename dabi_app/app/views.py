@@ -1,39 +1,18 @@
 from . import app
-from .models import *
-import datetime as dt
+from models import *
+from resources import *
 import os
-#import json
 from flask import render_template, redirect, request, flash, g, session, url_for, send_file
 
 app.secret_key = os.urandom(24).encode('hex')
 
 '''
-REST API SECTION
+REST API ROUTES
 '''
 from flask_restful import reqparse, abort, Api, Resource
 api=Api(app)
-
-
-class Trains(Resource):
-    def get(self):
-        return get_all_trains()
-
-class Stations(Resource):
-    def get(self):
-        return get_all_stations()
-
-class Train_schedule(Resource):
-    def get(self,start_station,end_station,trip_date,time_of_day):
-        start_station = get_station_id(start_station)
-        end_station = get_station_id(end_station)
-        
-        return get_trains_from_station(start_station,end_station,trip_date,time_of_day), 200
-
-
 api.add_resource(Train_schedule, '/schedule/<start_station>/<end_station>/<trip_date>/<time_of_day>')
-api.add_resource(Trains,'/trains')
 api.add_resource(Stations,'/stations')
-
 
 
 
