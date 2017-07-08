@@ -109,7 +109,10 @@ def get_station_id(stationcode):
         cur = con.cursor()
         # need the comma here or python doesn't recognize (stationcode) as a tuple
         cur.execute("SELECT station_id from Stations WHERE station_code =?;", (stationcode,))
-        return cur.fetchall()[0][0]
+        r = cur.fetchone()
+        if r:
+            return r[0]
+        else: return None
 
 
 '''
@@ -134,7 +137,10 @@ def get_trains_from_station(start_station,end_station,date,time_of_day=None):
         direction = 1
     else: direction = 0
     #weekday/weekend trains
-    day = pydate(date).weekday()
+    try:    
+        day = pydate(date).weekday()
+    except ValueError:
+        return None
     if(day<5): 
         day = "MF"
     else:
@@ -152,6 +158,7 @@ def get_trains_from_station(start_station,end_station,date,time_of_day=None):
         cur.execute(squery,(direction, day, start_station, end_station, start_train_time,end_train_time))
 
         a_trains=list(cur.fetchall())
+        if not a_trains: return None
         trains_list = []
         for t in a_trains:
             train = {}
