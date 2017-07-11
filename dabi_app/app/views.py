@@ -11,8 +11,8 @@ REST API ROUTES
 '''
 from flask_restful import reqparse, abort, Api, Resource
 api=Api(app)
-api.add_resource(Train_schedule, '/schedule/<start_station>/<end_station>/<trip_date>/<time_of_day>')
 api.add_resource(Stations,'/stations')
+api.add_resource(Schedule,'/schedule')
 
 
 
