@@ -18,7 +18,10 @@ class Schedule(Resource):
         start_station = get_station_id(args['start_station'].upper())
         end_station= get_station_id( args['end_station'].upper() )
         time_of_day = args['time_of_day']
-        if not time_of_day: time_of_day = "anytime"
+        if not time_of_day: 
+            time_of_day = "anytime"
+        else:
+            time_of_day=time_of_day.lower()
         trip_date=args['trip_date']
         r = get_trains_from_station(start_station,end_station,trip_date,time_of_day)
         if r :
