@@ -1,4 +1,5 @@
 import sqlite3 as sql
+from . import app
 #import json
 import collections
 from datetime import datetime, timedelta
@@ -8,7 +9,7 @@ from random import randint
 create new passenger
 '''
 def create_passenger(p_lname,p_fname,p_address,p_email):
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("INSERT INTO Passengers (passenger_lname,passenger_fname,passenger_billing_address,passenger_email) VALUES (?,?,?,?);", (p_lname, p_fname,p_address,p_email))
         con.commit()
@@ -18,7 +19,7 @@ def create_passenger(p_lname,p_fname,p_address,p_email):
 
 '''create ticket'''
 def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_id, fare, round_trip, return_train, return_date_time):
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q=("INSERT INTO Tickets(trip_starts, trip_ends, trip_train, trip_date, passenger_id," 
             "round_trip, return_train, return_date, fare)"
@@ -36,7 +37,7 @@ def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_i
 '''
 def update_free_seats(start_station,end_station,train_num,date, diff=-1):
     if(start_station>end_station): start_station,end_station=end_station,start_station
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         q = ("update Seats_free "
             "SET sf_seats_free = sf_seats_free + (?) "
             "WHERE sf_train_num=? AND sf_date=? AND " 
@@ -53,13 +54,13 @@ for filing drop-downs etc in templates
 '''
 
 def get_all_trains():
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("SELECT train_num from Trains ;")
         return [ t[0] for t in list(cur.fetchall())]     
 
 def get_all_stations():
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("SELECT station_name,station_code from Stations;")
         s_list = list(cur.fetchall())
@@ -72,7 +73,7 @@ def get_all_stations():
         return all_stations
 
 def get_train_seats(train_num,train_date):
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q=("select sf.sf_seats_free, sg.segment_north,sg.segment_south from Seats_free sf JOIN "
          "segments sg on sf.sf_seg_id=sg.segment_id AND sf.sf_train_num=? AND "
@@ -90,13 +91,13 @@ def get_train_seats(train_num,train_date):
 
 
 def get_all_passengers():
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute(" SELECT * from Passengers")
         return cur.fetchall()
 
 def get_all_tickets():
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute(" SELECT * from Tickets")
         return cur.fetchall()
@@ -105,7 +106,7 @@ def get_all_tickets():
     method for getting station id from station symbol
 '''
 def get_station_id(stationcode):
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         # need the comma here or python doesn't recognize (stationcode) as a tuple
         cur.execute("SELECT station_id from Stations WHERE station_code =?;", (stationcode,))
@@ -146,7 +147,7 @@ def get_trains_from_station(start_station,end_station,date,time_of_day=None):
     else:
         day = "SSH"
     
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         squery=("select sa.train_num, sa.time_out, sa2.time_in " 
                 "from stops_at sa join trains t on "
@@ -172,7 +173,7 @@ def get_trains_from_station(start_station,end_station,date,time_of_day=None):
 
 #this is a more efficient checking of free seats, call when rebooking.
 def is_seats_available(start_station, end_station, train_num, date):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         stmt = ("SELECT sf_seats_free FROM Seats_Free WHERE sf_seg_id IN (SELECT segment_id "
                 "FROM Segments WHERE (segment_north >= ? AND segment_north < ?)"
@@ -186,7 +187,7 @@ def is_seats_available(start_station, end_station, train_num, date):
 #get seg_id for two stations //declutter queries
 def get_seg_id(start_station,end_station):
     if(end_station<start_station): start_station,end_station = end_station,start_station
-    with sql.connect("database.db") as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q = "SELECT segment_id from Segments where (segment_north>=? and segment_south<=?)"
         cur.execute(q,(start_station,end_station))
@@ -200,7 +201,7 @@ def check_free_seats(start_station, end_station, train_num, date):
     next_station = start_station+1
     while (next_station<=end_station):
         seg_id = get_seg_id(start_station,next_station)
-        with sql.connect("database.db") as con:
+        with sql.connect(app.config["DATABASE"]) as con:
             cur = con.cursor()
             cur.execute("INSERT OR IGNORE INTO Seats_free values (?,?,?,?)",(train_num,seg_id,date,448))
             con.commit()
@@ -253,7 +254,7 @@ Getting passengers reservations and handling all previous tickets
 
 
 def get_passenger_reservation(passengerID):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("""SELECT t.trip_id, t.trip_train, ls.station_name origin, le.station_name destination, 
                         t.trip_date, t.round_trip, t.return_train, t.return_date, t.fare, t.cancelled
@@ -267,7 +268,7 @@ def get_passenger_reservation(passengerID):
 
 
 def rebook_ticket(ticketID):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q = (" UPDATE Tickets "
             "SET cancelled = 0 "            
@@ -277,7 +278,7 @@ def rebook_ticket(ticketID):
 
 
 def cancel_ticket(ticketID):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         query_stmt = ("UPDATE Tickets SET cancelled = 1 WHERE trip_id = ?")
         cur.execute(query_stmt, (ticketID, ))
@@ -286,7 +287,7 @@ def cancel_ticket(ticketID):
 
 
 def get_ticket_record(ticketID):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         query_stmt = ("SELECT * FROM Tickets WHERE trip_id = ?")
         cur.execute(query_stmt, (ticketID,))
@@ -297,7 +298,7 @@ def get_ticket_record(ticketID):
 
 # returns a list of tuple of all rows in `temp_stops_at` table
 def get_train_status(train_num):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         query_stmt = ("SELECT station_id,time_in,delayed FROM temp_stops_at where train_num = ?")
         cur.execute(query_stmt,(train_num,))
@@ -306,7 +307,7 @@ def get_train_status(train_num):
 
 
 def create_temp_stops_at():
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q=(" CREATE TABLE if not exists temp_stops_at("
         "station_id int, train_num int ,time_in DATETIME, time_out DATETIME, "
@@ -320,7 +321,7 @@ def create_temp_stops_at():
 
 ##update relevant trains given a "root" delayed train
 def update_all_trains(train_days,direction,first_delayed_train):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q = (" select train_num from Trains where train_days = ? AND direction = ?")
         cur.execute(q,(train_days,direction))
@@ -337,7 +338,7 @@ def update_all_trains(train_days,direction,first_delayed_train):
 # put all the records from the `stops_at` table into `temp_stops_at` table
 # apply specified offset to all the data in `time_in` and `time_out` fields in `temp_stops_at` table
 def delay_random_train(offset):
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         # clear the `temp_stops_at` table
         cur.execute("DELETE from temp_stops_at")
@@ -360,7 +361,7 @@ def delay_random_train(offset):
 
 ##move repeated actions over here, inserts all stops_at into temp_stops_at and turns time in datetime
 def insert_into_temp_stops_at():
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         #insert schedule time into temp_stops_at
         for train_num in get_all_trains():
@@ -399,7 +400,7 @@ def update_train_status(train_num,direction):
         stops=[26,23,19,17,14,10,4,3,1]
     if(direction==0): 
         stops = reversed(stops)
-    with sql.connect('database.db') as con:
+    with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         for st in stops:
             #get the time lastest time out for any train (same direction) in temp stops_at
