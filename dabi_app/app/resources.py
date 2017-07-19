@@ -6,6 +6,20 @@ class Stations(Resource):
     def get(self):
         return get_all_stations()
 
+class Passenger(Resource):
+    def get(self,passenger_id):
+        p = get_passenger_info(passenger_id)
+        if p:
+            p = dict(
+                first_name = p[1],
+                last_name = p[2],
+                address = p[3],
+                email = p[4]
+            )
+            return p
+        return None
+            
+
 #from /schedule
 class Schedule(Resource):
     def get(self):

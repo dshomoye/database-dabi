@@ -8,17 +8,28 @@ from random import randint
 '''
 create new passenger
 '''
-def create_passenger(p_lname,p_fname,p_address,p_email):
+def create_passenger(p_lname,p_fname,p_address,p_email=None):
     with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("INSERT INTO Passengers (passenger_lname,passenger_fname,passenger_billing_address,passenger_email) VALUES (?,?,?,?);", (p_lname, p_fname,p_address,p_email))
         con.commit()
         cur.execute("SELECT LAST_INSERT_ROWID();")
-        return cur.fetchall()[0][0]
+        r = cur.fetchone()
+        return r[0] if r else r
 
+
+def check_p_id(p_id):
+    with sql.connect(app.config["DATABASE"]) as con:
+        cur = con.cursor()
+        q = (""" SELECT passenger_id from Passengers 
+                WHERE passenger_id = ?
+                """)
+        cur.execute(q,(p_id,))
+        r = cur.fetchone()
+        return r[0] if r else  r
 
 '''create ticket'''
-def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_id, fare, round_trip, return_train, return_date_time):
+def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_id, fare, round_trip=0, return_train=None, return_date_time=None):
     with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         q=("INSERT INTO Tickets(trip_starts, trip_ends, trip_train, trip_date, passenger_id," 
@@ -29,7 +40,8 @@ def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_i
         cur.execute(q,(start_station,end_station,train_num,trip_date_time,passenger_id,round_trip,return_train,return_date_time,fare))
         con.commit()
         cur.execute("SELECT LAST_INSERT_ROWID();")
-        return cur.fetchall()[0][0]
+        r = cur.fetchone()
+        return r[0] if r else r
 
 '''
  update free seats by adding or removing free seats, 
@@ -101,6 +113,15 @@ def get_all_tickets():
         cur = con.cursor()
         cur.execute(" SELECT * from Tickets")
         return cur.fetchall()
+
+def get_passenger_info(p_id):
+    with sql.connect(app.config["DATABASE"]) as con:
+        cur = con.cursor()
+        cur.execute("SELECT * from Passengers Where passenger_id =?",(p_id,))
+        r = cur.fetchone()
+        return r
+
+
 
 '''
     method for getting station id from station symbol

@@ -13,6 +13,7 @@ from flask_restful import reqparse, abort, Api, Resource
 api=Api(app)
 api.add_resource(Stations,'/stations')
 api.add_resource(Schedule,'/schedule')
+api.add_resource(Passenger,'/passengers/<passenger_id>')
 
 
 
@@ -57,7 +58,8 @@ def train_status():
     rand_t = delay_random_train(45)
     affected_trains = update_all_trains(rand_t[0],rand_t[1],rand_t[2])
     trains = get_all_trains()
-    return render_template("train_status.html", trains=trains, root_train=rand_t[2], affected_trains=affected_trains)
+    return render_template("train_status.html", trains=trains, 
+                            root_train=rand_t[2], affected_trains=affected_trains)
 
 
 @app.route('/show_status', methods = ["POST"])
@@ -90,7 +92,9 @@ def schedule_result():
 
     all_trains = get_trains_from_station(start_station,end_station,trip_date,trip_time_of_day)
 
-    return render_template("schedule_result.html",all_trains=all_trains, trip_date=trip_date, trip_time_of_day=trip_time_of_day, start_station = start_station_code, end_station = end_station_code, )
+    return render_template("schedule_result.html",all_trains=all_trains, 
+                            trip_date=trip_date, trip_time_of_day=trip_time_of_day, 
+                            start_station = start_station_code, end_station = end_station_code, )
 
 
 @app.route('/search_results', methods=["GET", "POST"])
@@ -142,7 +146,10 @@ def search_results():
             free_trains.append(t)
 
     ##Change to return only free trains
-    return render_template("search_results.html",all_trains=free_trains, trip_date=trip_date, trip_time_of_day=trip_time_of_day, start_station = session['start_station_name'], end_station = session['end_station_name'],fare=session['fare'] )
+    return render_template("search_results.html",all_trains=free_trains, 
+                                trip_date=trip_date, trip_time_of_day=trip_time_of_day, 
+                                start_station = session['start_station_name'], 
+                                end_station = session['end_station_name'],fare=session['fare'] )
 
 
 ## get user (or new user) info and send to confirmation through the form.
@@ -159,7 +166,8 @@ def booktrip(train_num,train_time):
         #call choose return to get return booking
         return choosereturn()
     else:
-        return render_template("passenger_trip.html", start_station=session['start_station_name'],end_station=session['end_station_name']);
+        return render_template("passenger_trip.html", start_station=session['start_station_name'],
+                                    end_station=session['end_station_name']);
 
 
 # re-render search results for the return trip
@@ -186,23 +194,28 @@ def confirm_book():
     result = request.form
     #check if new user or returning
     if('passenger_id' not in result):
-        p_id = create_passenger(result['lname'],result['fname'],result['email'],result['address'])
+        p_id = create_passenger(result['lname'],result['fname'],
+                                result['email'],result['address'])
     else:
         p_id = result['passenger_id']
     #update free seats for both trips
-    update_free_seats(session['start_station'],session['end_station'],session['trip_train'],session['trip_date'])
+    update_free_seats(session['start_station'],session['end_station'],
+                        session['trip_train'],session['trip_date'])
 
     trip_date_time = ("%s %s" % (session['trip_date'], session['trip_time']))
 
     #update values for return trip
     if(session['return_booking']):
-        update_free_seats(session['end_station'],session['start_station'],session['return_train'],session['return_date'])
+        update_free_seats(session['end_station'],session['start_station'],
+                                session['return_train'],session['return_date'])
         return_date_time = ("%s %s" % (session['return_date'], session['return_time']))
     else: return_date_time = None
 
     #create ticket for user
     ticket_num = create_ticket(session['start_station'],session['end_station'],
-                               session['trip_train'], trip_date_time, p_id, session['fare'], session['return_booking'], session['return_train'], return_date_time,)
+                               session['trip_train'], trip_date_time, 
+                               p_id, session['fare'], session['return_booking'], 
+                               session['return_train'], return_date_time,)
     return render_template("confirmation.html", passenger_id=p_id, ticket_num =ticket_num)
 
 
