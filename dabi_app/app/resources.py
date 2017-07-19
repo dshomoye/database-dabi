@@ -27,4 +27,4 @@ class Schedule(Resource):
         if r :
             return r,200
         else:
-            abort(404, message="invalid argument")
+            abort(404)
