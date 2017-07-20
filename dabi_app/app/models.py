@@ -29,6 +29,7 @@ def check_p_id(p_id):
         return r[0] if r else  r
 
 '''create ticket'''
+#TODO fix this parameter monstrosity
 def create_ticket(start_station,end_station,train_num,trip_date_time,passenger_id, fare, round_trip=0, return_train=None, return_date_time=None):
     with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
@@ -185,6 +186,8 @@ def get_trains_from_station(start_station,end_station,date,time_of_day=None):
         for t in a_trains:
             train = {}
             train['train_num'] = t[0]
+            train['fare'] = abs(start_station - end_station)*2
+            if (t[0]>26) : train['fare'] = abs(start_station-end_station)*2
             train['time_out'] = t[1]
             train['arrival'] = t[2]
 
