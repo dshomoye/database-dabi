@@ -1,6 +1,5 @@
 import sqlite3 as sql
 from . import app
-#import json
 import collections
 from datetime import datetime, timedelta
 from random import randint

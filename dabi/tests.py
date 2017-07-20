@@ -1,7 +1,7 @@
 import os,tempfile, shutil
-from app import app
+from dabi import app
 from flask import json
-from app.models import *
+from dabi.models import *
 import unittest
 
 
