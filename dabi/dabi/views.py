@@ -13,7 +13,7 @@ from flask_restful import reqparse, abort, Api, Resource
 api=Api(app)
 api.add_resource(Stations,'/stations')
 api.add_resource(Schedule,'/schedule')
-api.add_resource(Passenger,'/passengers/<int:passenger_id>')
+api.add_resource(Passenger,'/passengers/<int:passenger_id>','/passengers')
 api.add_resource(Ticket,'/tickets','/tickets/<int:ticket_number>')
 
 

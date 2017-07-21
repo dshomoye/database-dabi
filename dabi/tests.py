@@ -38,7 +38,7 @@ class DabiTestCase(unittest.TestCase):
                     u'06:02:00', u'train_num': 1
                 } in d
     
-    def test_get_passenger_api(self):
+    def test_passenger_api(self):
         p = self.app.get('passengers/1')
         self.assertEqual(json.loads(p.data),
             {

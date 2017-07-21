@@ -7,7 +7,7 @@ from random import randint
 '''
 create new passenger
 '''
-def create_passenger(p_lname,p_fname,p_address,p_email=None):
+def create_passenger(p_lname,p_fname,p_address=None,p_email=None):
     with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
         cur.execute("INSERT INTO Passengers (passenger_lname,passenger_fname,passenger_billing_address,passenger_email) VALUES (?,?,?,?);", (p_lname, p_fname,p_address,p_email))

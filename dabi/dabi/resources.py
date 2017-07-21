@@ -18,6 +18,23 @@ class Passenger(Resource):
             )
             return p
         return None
+    
+    def post(self):
+        sp = reqparse.RequestParser()
+        sp.add_argument("first_name",required=True)
+        sp.add_argument("last_name",required=True)
+        sp.add_argument("email",required=True)
+        sp.add_argument("address")
+        args = sp.parse_args()
+        if "address" not in args:
+            args["address"] = None
+        p = create_passenger(
+            args['last_name'],
+            args['first_name'],
+            args['address'],
+            args['email']
+        )
+        return p
 
 class Ticket(Resource):
     def post(self):
