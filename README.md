@@ -4,9 +4,8 @@ along with the web app and API endpoints (which I added to make things more inte
 >  this was a database focused class, being able to write correct SQL for managing the entire database was important hence the lack of use of an ORM. 
 
 Everything is in Python (2.7)
-The web server is implemented with Flask (`pip install flask`)
-And the API endpoint is with FLask RESTful (`pip install flask_restful`)
-Running is simple: `python run.py`
+The web server is implemented with Flask And the API endpoint is with FLask RESTful, JWT tokens with pyjwt and passlib for password hashing
+start the server with: `python run.py`, or `export FLASK_APP=run.py` and `flask run` after that. 
 
 An accompanying Android App that takes advantage of the API is in the works.
 
@@ -101,14 +100,14 @@ URL: `\tickets`
     * token (user must be owner of {ticket_number})
     
 **POST** : <`\tickets`>
-    * data parameters:
-        - token
-        - passenger_id
-        - start_station
-        - end_station
-        - train_number
-        - trip_date_time: e.g. `'2017-07-08 04:05:06'`
-        - fare
-        - *return_date_time*
-        - *return_train*
+* data parameters:
+    - token
+    - passenger_id
+    - start_station
+    - end_station
+    - train_number
+    - trip_date_time: e.g. `'2017-07-08 04:05:06'`
+    - fare
+    - *return_date_time*
+    - *return_train*
 
