@@ -5,8 +5,6 @@ __pycache__/
 
 *.pyc
 
-run.py
-
 # image files
 *.JPG
 *.jpg

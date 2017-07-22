@@ -7,15 +7,38 @@ from random import randint
 '''
 create new passenger
 '''
-def create_passenger(p_lname,p_fname,p_address=None,p_email=None):
+def create_passenger(username,hashp,lname,fname,email,address=None):
     with sql.connect(app.config["DATABASE"]) as con:
         cur = con.cursor()
-        cur.execute("INSERT INTO Passengers (passenger_lname,passenger_fname,passenger_billing_address,passenger_email) VALUES (?,?,?,?);", (p_lname, p_fname,p_address,p_email))
+        cur.execute("""INSERT INTO Passengers 
+        (passenger_lname,passenger_fname,passenger_billing_address,
+        passenger_email,user_name,password_hash) VALUES (?,?,?,?,?,?);""", 
+        (lname, fname,address,email,username,hashp))
         con.commit()
         cur.execute("SELECT LAST_INSERT_ROWID();")
         r = cur.fetchone()
         return r[0] if r else r
 
+def get_passenger_auth(passenger_id):
+    with sql.connect(app.config["DATABASE"]) as con:
+        cur = con.cursor()
+        cur.execute("""
+            SELECT password_hash from Passengers
+            WHERE passenger_id = ?
+        """,(passenger_id,))
+        r = cur.fetchone()
+        return r[0] if r else r
+
+def get_user_auth(user_name):
+    with sql.connect(app.config["DATABASE"]) as con:
+        cur = con.cursor()
+        cur.execute("""
+            SELECT password_hash from Passengers
+            WHERE user_name = ?
+        """,(user_name,))
+        r = cur.fetchone()
+        print r
+        return r[0] if r else r
 
 def check_p_id(p_id):
     with sql.connect(app.config["DATABASE"]) as con:

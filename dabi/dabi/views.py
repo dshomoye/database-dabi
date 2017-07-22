@@ -2,7 +2,7 @@ from . import app
 from models import *
 from resources import *
 import os
-from flask import render_template, redirect, request, flash, g, session, url_for, send_file
+from flask import render_template, request, g, session, url_for, send_file
 
 app.secret_key = os.urandom(24).encode('hex')
 
@@ -15,6 +15,7 @@ api.add_resource(Stations,'/stations')
 api.add_resource(Schedule,'/schedule')
 api.add_resource(Passenger,'/passengers/<int:passenger_id>','/passengers')
 api.add_resource(Ticket,'/tickets','/tickets/<int:ticket_number>')
+api.add_resource(Token,'/login')
 
 
 
@@ -301,13 +302,6 @@ def bootstrapminjs():
 def timepickerjs():
     return render_template("bootstrap-datetimepicker.min.js")
 
-
-@app.route("/login", methods=["GET","POST"])
-def login():
-    if 'username' in session:
-        return render_template("login.html",username=session['username'])
-    else:
-        return render_template("login.html")
 
 
 @app.template_filter('strftime')
