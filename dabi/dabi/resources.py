@@ -1,13 +1,50 @@
 from flask_restful import Resource, abort, reqparse
 from models import *
+from . import pwd_context
+import datetime
+import jwt
+from functools import wraps
+
+
+def check_token(token,hashp):
+    if not Token:
+        return False
+    try:
+        d = jwt.decode(token,hashp)
+    except:
+        return False
+    return True
 
 # from /stations 
 class Stations(Resource):
     def get(self):
         return get_all_stations()
 
+class Token(Resource):
+    def post(self):
+        sp = reqparse.RequestParser()
+        sp.add_argument("username",required=True)
+        sp.add_argument("password",required=True)
+        args = sp.parse_args()
+        pauth = get_user_auth(args["username"])
+        if pwd_context.verify(args["password"], pauth):
+            token = jwt.encode({"username":args["username"],
+                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+            },
+            pauth
+            )
+            return {"token":token}
+        return "Login failed, verify username and password",403
+
+
 class Passenger(Resource):
     def get(self,passenger_id):
+        hashp = get_passenger_auth(passenger_id)
+        sp = reqparse.RequestParser()
+        sp.add_argument("token", required=True)
+        args = sp.parse_args()
+        if not check_token(args["token"],hashp):
+            return "Invalid token",403
         p = get_passenger_info(passenger_id)
         if p:
             p = dict(
@@ -25,14 +62,19 @@ class Passenger(Resource):
         sp.add_argument("last_name",required=True)
         sp.add_argument("email",required=True)
         sp.add_argument("address")
+        sp.add_argument("username",required=True)
+        sp.add_argument("password",required=True)
         args = sp.parse_args()
         if "address" not in args:
             args["address"] = None
+        hashp = pwd_context.hash(args["password"])
         p = create_passenger(
-            args['last_name'],
-            args['first_name'],
-            args['address'],
-            args['email']
+            lname = args['last_name'],
+            fname = args['first_name'],
+            address = args['address'],
+            email = args['email'],
+            username = args["username"],
+            hashp = hashp
         )
         return p
 

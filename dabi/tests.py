@@ -69,7 +69,7 @@ class DabiTestCase(unittest.TestCase):
             assert i in rv
     
     def test_create_passenger(self):
-        p = create_passenger("John","Smith","777 ysw, 2938","dsd@dsaew")
+        p = create_passenger("John","Smith","777 ysw, 2938","dsd@dsaew","js","jsp")
         pi = get_passenger_info(p)
         self.assertNotEqual(check_p_id(p),None)
         #self.assertEqual(pi,["John","Smith","777 ysw, 2938","dsd@dsaew"])
