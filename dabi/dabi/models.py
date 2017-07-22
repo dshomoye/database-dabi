@@ -27,7 +27,6 @@ def get_passenger_auth(passenger_id):
             WHERE passenger_id = ?
         """,(passenger_id,))
         r = cur.fetchone()
-        print r
         return r[0] if r else r
 
 def get_user_auth(user_name):

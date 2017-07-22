@@ -3,6 +3,8 @@ from dabi import app
 from flask import json
 from dabi.models import *
 import unittest
+import jwt
+import datetime
 
 
 class DabiTestCase(unittest.TestCase):
@@ -38,8 +40,21 @@ class DabiTestCase(unittest.TestCase):
                     u'06:02:00', u'train_num': 1
                 } in d
     
+    def test_login(self):
+        u = "jay"
+        p = "jaypass"
+        hp = get_user_auth(u)
+        q = "/login?username={0}&password={1}".format(u,p)
+        t = self.app.post(q)
+        t = json.loads(t.data)
+        c = jwt.encode({"username": u, 'exp' : datetime.datetime.utcnow() 
+        + datetime.timedelta(minutes=30)
+            },hp) 
+        assert ( str(c) in  str(t))
+    
     def test_passenger_api(self):
-        p = self.app.get('passengers/1')
+        t = jwt.encode({"m":"n"},get_passenger_auth(1))
+        p = self.app.get('passengers/1?token=%s'%t)
         self.assertEqual(json.loads(p.data),
             {
                 "first_name": "Butt", "last_name": "Abu", 

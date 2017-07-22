@@ -29,6 +29,16 @@ URL: `\stations`
 *GET*: 
     - data parameters: none
 
+    sample response: [
+    {
+        "station_code": "BOST",
+        "station_name": "Boston South Station, MA"
+    },
+    {
+        "station_code": "BBAY",
+        "station_name": "Boston Back Bay, MA"
+    },... ]
+
 #### `Schedule` :
 URL `\schedule`
 *Methods*:
@@ -39,13 +49,40 @@ URL `\schedule`
     - trip_date
     - *time_of_day* (optional)
 
+- sample query:
+    
+    `/schedule?start_station=MYST&end_station=WGTN&trip_date=2017-20-05`
+- response:
+
+    `[
+    {
+        "arrival": "08:45:00",
+        "fare": 26,
+        "time_out": "05:32:00",
+        "train_num": 9
+    },
+    {
+        "arrival": "11:45:00",
+        "fare": 26,
+        "time_out": "08:32:00",
+        "train_num": 10
+    }, ... ]`
+
 #### `Passenger`:
 URL: `\passengers\{passenger_id}`
 *Methods*:
 * GET:
     - data parameters:
         * token
-* POST
+- sample query: 
+
+    `/passengers/5?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpheSIsImV4cCI6MTUwMDcyNzYxOH0.4-57_43Hx7y6Uk-oNWU_L6VulKSHOsqrLpodh176Pcs`
+
+- response:
+
+    `{ "address": "as", "email": "jay@jay", "first_name": "jay", "last_name": "jay" }`
+
+* POST - returns the passenger_id on successful creation
     - data parameters:
         * username
         * password
@@ -53,6 +90,7 @@ URL: `\passengers\{passenger_id}`
         * last_name
         * email
         * *address* (optional)
+    
 
 #### `Ticket`:
 URL: `\tickets`
@@ -61,6 +99,7 @@ URL: `\tickets`
 **GET**: <`\tickets\{ticket_numer}`>
 - data parameters: 
     * token (user must be owner of {ticket_number})
+    
 **POST** : <`\tickets`>
     * data parameters:
         - token
