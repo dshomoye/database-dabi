@@ -1,5 +1,5 @@
 ## Database, webapp and API for fictional NE Railway system
-This is more or less a proof of concept/use case of a datasbase for a train system - originally a school project,
+This is more or less a sample case of a datasbase/backend servver for a train system - originally a school project,
 along with the web app and API endpoints (which I added to make things more interesting) 
 >  this was a database focused class, being able to write correct SQL for managing the entire database was important hence the lack of use of an ORM. 
 
