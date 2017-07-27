@@ -12,7 +12,7 @@ An accompanying Android App that takes advantage of the API is in the works.
 ***
 ### For the REST API, these are the resources and corresponding methods currently implemented:
 
-For making changes to Tickets and viewing passenger info, the cliet must be logged in at /login
+For making changes to Tickets and viewing passenger info, the cliet must be logged in at `/login`
 * POST with data:
 ```
 {
@@ -23,7 +23,7 @@ For making changes to Tickets and viewing passenger info, the cliet must be logg
 a token will be issued if password is right. subsequent requests should include this token.
 
 #### `Station` :
-URL: `\stations`
+URL: `/stations`
 *Methods*: 
 *GET*: 
     - data parameters: none
@@ -39,7 +39,7 @@ URL: `\stations`
     },... ]
 
 #### `Schedule` :
-URL `\schedule`
+URL `/schedule`
 *Methods*:
 **GET**:
 * data parameters:
@@ -68,7 +68,7 @@ URL `\schedule`
     }, ... ]`
 
 #### `Passenger`:
-URL: `\passengers\{passenger_id}`
+URL: `/passengers/{passenger_id}`
 *Methods*:
 * GET:
     - data parameters:
@@ -92,14 +92,14 @@ URL: `\passengers\{passenger_id}`
     
 
 #### `Ticket`:
-URL: `\tickets`
+URL: `/tickets`
 *Methods*:
 
-**GET**: <`\tickets\{ticket_numer}`>
+**GET**: <`/tickets/{ticket_numer}`>
 - data parameters: 
     * token (user must be owner of {ticket_number})
     
-**POST** : <`\tickets`>
+**POST** : <`/tickets`>
 * data parameters:
     - token
     - passenger_id
