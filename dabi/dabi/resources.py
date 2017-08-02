@@ -133,7 +133,7 @@ class Ticket(Resource):
                 return_train = return_train
         )
         #the ticket number or None if failed
-        return t
+        return {"ticket_number": t}
     
     def get(self,ticket_number=None):
         #get info for single ticket
