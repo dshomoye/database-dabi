@@ -84,6 +84,18 @@ class Passenger(Resource):
         return p
 
 class Ticket(Resource):
+    #TODO write the delete method for cancelling reservations
+    #TODO write update method for rebooking cancelled trip
+    def delete(self,ticket_number):
+        sp = reqparse.RequestParser()
+        sp.add_argument("token",required=True,help="Go to /login to retrieve a valid token")
+        sp.add_argument("passenger_id",required=True,type=int)
+        args = sp.parse_args()
+        if not check_token(args["token"],get_passenger_auth(args["passenger_id"])):
+          return "Invalid token", 403
+        cancel_ticket(ticket_number)
+        return "Success",200  
+
     def post(self):
         sp = reqparse.RequestParser()
         arguments = ["passenger_id","start_station","end_station",
@@ -123,25 +135,49 @@ class Ticket(Resource):
         #the ticket number or None if failed
         return t
     
-    def get(self,ticket_number):
-        sp = reqparse.RequestParser()
-        sp.add_argument("token",required=True)
-        args = sp.parse_args()
-        ti = get_ticket_record(ticket_number)
-        result = dict(
-            start_station = ti[1],
-            end_station = ti[2],
-            train_number = ti[3],
-            trip_date_time = ti[4],
-            passenger_id = ti[5],
-            round_trip = ti[6],
-            return_train = ti[7],
-            return_date_time = ti[8],
-            fare=ti[9]
-        )
-        if not check_token(args["token"], 
-        get_passenger_auth(result["passenger_id"])):
-            return "Invalid token", 403
+    def get(self,ticket_number=None):
+        #get info for single ticket
+        if(ticket_number):
+            sp = reqparse.RequestParser()
+            sp.add_argument("token",required=True)
+            args = sp.parse_args()
+            ti = get_ticket_record(ticket_number)
+            result = dict(
+                start_station = ti[1],
+                end_station = ti[2],
+                train_number = ti[3],
+                trip_date_time = ti[4],
+                passenger_id = ti[5],
+                round_trip = ti[6],
+                return_train = ti[7],
+                return_date_time = ti[8],
+                fare=ti[9]
+            )
+            if not check_token(args["token"], 
+                        get_passenger_auth(result["passenger_id"])):
+                return "Invalid token", 403
+        # or get all tickets for a single passenger
+        else:
+            sp = reqparse.RequestParser()
+            sp.add_argument("token",required=True)
+            sp.add_argument("passenger_id",required=True,type=int)
+            args = sp.parse_args()
+            if not check_token(args["token"],get_passenger_auth(args["passenger_id"])):
+                return "Invalid token", 403
+            re = get_passenger_reservation(args["passenger_id"])
+            result=[]
+            for r in re:
+                result.append(dict(
+                    ticket_number = r[0],
+                    train = r[1],
+                    start_station = r[2],
+                    end_station= r[3],
+                    date = r[4],
+                    round_trip = r[5],
+                    return_train = r[6],
+                    return_date = r[7]
+                ))
+            
         return result
 
             

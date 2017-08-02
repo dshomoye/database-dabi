@@ -95,9 +95,11 @@ URL: `/passengers/{passenger_id}`
 URL: `/tickets`
 *Methods*:
 
-**GET**: <`/tickets/{ticket_numer}`>
+**GET**: <`/tickets/{ticket_numer:*optional*}`>
 - data parameters: 
-    * token (user must be owner of {ticket_number})
+    * token:required (user must be owner of {ticket_number})
+    * `passenger_id` : required if `{ticket_number}` not provided 
+this returns info for all tickets bought by {passenger\_id} otherwise return info for {ticket_number} (one but not both of the two *must* be used)
     
 **POST** : <`/tickets`>
 * data parameters:
@@ -110,4 +112,10 @@ URL: `/tickets`
     - fare
     - *return_date_time*
     - *return_train*
+
+**DELETE** : <`/tickets/{ticket_number}`>
+> cancels a booked ticket (might be available for rebook)
+- parameters:
+    * token : required
+    * passenger_id  required
 
