@@ -81,7 +81,7 @@ class Passenger(Resource):
             username = args["username"],
             hashp = hashp
         )
-        return p
+        return {"passenger_id":p}
 
 class Ticket(Resource):
     #TODO write the delete method for cancelling reservations
