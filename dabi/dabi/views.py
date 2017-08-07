@@ -4,8 +4,13 @@ from resources import *
 from datetime import datetime, date
 import os
 from flask import render_template, request, g, session, url_for, send_file
+from flask_cors import CORS, cross_origin
+
 
 app.secret_key = os.urandom(24).encode('hex')
+
+##enable CORS
+CORS(app)
 
 '''
 REST API ROUTES
